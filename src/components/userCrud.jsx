@@ -14,6 +14,8 @@ import {
   getUsers,
   updateUser,
 } from '../database/firestoreCRUD';
+import utils from '../utils/Index';
+
 
 export default function UserCrud() {
   //State
@@ -22,8 +24,6 @@ export default function UserCrud() {
   const [phone, setPhone] = useState('');
   const [users, setUsers] = useState([]);
   const [editId, setEditId] = useState(null);
-
-  console.log('usersDataa',users)
 
   // Get User
   const fetchUsers = async () => {
@@ -40,10 +40,24 @@ useEffect(()=> {
 
 //post User
 const handleSubmit = async () => {
-  if(!name || !email || !phone){
-      Alert.alert('Error', 'Please fill all the fields');
-      return;
+
+  if (utils.isEmptyOrSpaces(name)) {
+    utils.errorAlert('please enter valid email');
+    return;
   }
+  if (!utils.validateEmail(email)) {
+    utils.errorAlert('please enter valid email');
+    return;
+  }
+  if (utils.isEmptyOrSpaces(phone)) {
+    utils.errorAlert('please enter valid email');
+    return;
+  }
+
+  // if(!name || !email || !phone){
+  //     Alert.alert('Error', 'Please fill all the fields');
+  //     return;
+  // }
   const userData = { name, email, phone };
 
   try {
@@ -53,7 +67,8 @@ const handleSubmit = async () => {
       }
       else {
           await addUserData(userData);
-          Alert.alert('Success', 'User Added Successfully');
+          utils.successAlert('User Added Successfully')
+          // Alert.alert('Success', 'User Added Successfully');
       }
       setName('');
       setEmail('');
@@ -79,7 +94,8 @@ const handleDelete = async (id) => {
   console.log('delete id',id)
   try {
      await deleteUser(id);
-     Alert.alert('Success', 'User Deleted Successfully');
+     utils.successAlert('User Deleted Successfully')
+    //  Alert.alert('Success', 'User Deleted Successfully');
       fetchUsers();
   } catch (error) {
       Alert.alert('Error', error.message);
